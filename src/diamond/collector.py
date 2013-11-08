@@ -14,6 +14,10 @@ import time
 
 from diamond.metric import Metric
 
+# Collectors may prefix metric names with this to mark them as
+# absolute (i.e. not to be prepended with hostname)
+ABSOLUTE_PATH_MARKER = "___"
+
 # Detect the architecture of the system and set the counters for MAX_VALUES
 # appropriately. Otherwise, rolling over counters will cause incorrect or
 # negative values.
@@ -266,6 +270,11 @@ class Collector(object):
             virtual machine and should have a different
             root prefix.
         """
+
+        # If the path is absolute, do not prepend anything to it
+        if name.startswith(ABSOLUTE_PATH_MARKER):
+            return name[len(ABSOLUTE_PATH_MARKER):]
+
         if 'path' in self.config:
             path = self.config['path']
         else:
